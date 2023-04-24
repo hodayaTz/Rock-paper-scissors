@@ -1,43 +1,81 @@
-from random import choice
+from random import choice as Choice
 
-options = ["Rock🪨", "Paper📃", "Scissors✂️"]
+OPTIONS = ["Rock🪨", "Paper📃", "Scissors✂️"]
 
-# The optional pairs 
-pairs = [
-    (options[0], options[1]),
-    (options[1], options[2]),
-    (options[2], options[0])
+# The optional pairs
+PAIRS = [
+    (OPTIONS[0], OPTIONS[1]),
+    (OPTIONS[1], OPTIONS[2]),
+    (OPTIONS[2], OPTIONS[0])
 ]
 
+
 def rand_choice():
+    return Choice(OPTIONS)
+
+
+def get_winner(choices):
     """
-    rands choice for each player
-    """     
-    choice1 = choice(options)
-    new_opts = list(filter(lambda i: i !=choice1, options))
-    choice2 = choice(new_opts)
-    
-    return choice1, choice2
-    
-    
-def get_winner(*players_choice):
+    Returns the game result of the players
     """
-    returns the winner between 2 players
+    ch_list = list(choices.items())
+    if ch_list[0][1] == ch_list[1][1]:
+        print("The result of the game is a draw:)")
+        return 0
+    return ch_list[1][0] if (ch_list[0][1], ch_list[1][1]) in PAIRS else ch_list[0][0]
+
+
+def print_options():
+    print("Enter your choice:")
+    for i in range(len(OPTIONS)): print(i+1," for ", OPTIONS[i])
+   
+   
+def get_player_choice():
     """
-    return 1 if (players_choice[0], players_choice[1]) in pairs else 0
-    
+    Get player selection by input,
+    If the input is invalid, the computer will make a selection.
+    """
+    print_options()
+    try :
+        player_choice = int(input()) -1
+        return OPTIONS[player_choice]
+    except (ValueError, IndexError):
+        print("Your choice is invalid, The computer will choose for you.")
+        return rand_choice()
+
+
+def get_choices(names):
+    """
+    Provides each player's choice
+    :names: List with player's names 
+    :return: Dict with {name: choice} for each player
+    """
+    players_dict = {}
+    for name in names:
+        is_computer = input(name + ' Do you want the computer to choose for you?(y/n)').lower()
+        choice = rand_choice() if is_computer.startswith('y') else get_player_choice()
+        players_dict[name] = choice
+    return players_dict
+
+
 def main():
     name1 = input("Enter the name of the first player: \n")
     name2 = input("Enter the name of the second player: \n")
     players_names = [name1, name2]
     answer = 'yes'
-    while answer.startswith('y'):
-        players_choice = rand_choice()
-        for i in range(len(players_names)):
-            print(players_names[i]+": "+ players_choice[i])
-        winner = get_winner(*players_choice)
-        print("congrats! " +players_names[winner] + " is the winner!!")
-        answer = input('Do you want to play again?(y/n) \n')
+    players_choice = {}
     
-if __name__ == '__main__': 
+    while answer.lower().startswith('y'):
+        
+        players_choice = get_choices(players_names)
+        for name, choice in players_choice.items():
+            print(name , ": " ,choice)
+        winner = get_winner(players_choice)
+        if winner:
+            print("Congrats! " + winner + " is the winner!!")
+        
+        answer = input('Do you want to play again?(y/n) \n')
+
+
+if __name__ == '__main__':
     main()
